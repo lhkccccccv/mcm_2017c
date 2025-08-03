@@ -2,26 +2,19 @@ import pandas as pd
 import numpy as np
 import colorsys
 import math
+from pathlib import Path
 from pprint import pprint
 
 __all__ = ["read_csv1","coefficient_of_variation","covariance","greyscale_value"]
-# 根据RGB计算HSV
-def rgb2hsv(data:dict)->dict:
-    for k,v in data.items():
-        for row_idx in range(len(v)):
-            row = data[k][row_idx]
-            hsv_value = max(row[x] for x in range(1,4))
-            data[k][row_idx].append(hsv_value)
-    # 把data的值改为pd.DataFrame
-    cols = ['ppm','B','G','R','H','S','V']
-    for k in data:
-        data[k] = pd.DataFrame(data[k],columns=cols)
-    return data
+
 
 # 更改：rgb2hsv中，值的类型为pd.DataFrame.
 # 读取data1中的数据，返回字典，键为物质的名称，值的类型为list，分别为RGB和HS的np.float
 def read_csv1() -> dict:
-    csv1 = pd.read_csv("./data/Data1.CSV", sep=",", encoding="utf-8")
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parent.parent  # Adjust based on project structure
+    csv_path = project_root / "data" / "Data1.CSV"
+    csv1 = pd.read_csv(csv_path, sep=",", encoding="utf-8")
     csv1.iloc[:, 1:6] = csv1.iloc[:, 1:6].apply(pd.to_numeric, errors="coerce")
     csv1 = csv1.dropna(subset=["ppm", "B", "G", "R", "H","S"], how="all")
     data = {}
@@ -43,8 +36,6 @@ def read_csv1() -> dict:
             tmp = current[0]
         else:
             current[0] = tmp
-    # pprint(data,width=150)
-    data = rgb2hsv(data)
     return data
 
 
@@ -64,8 +55,8 @@ def coefficient_of_variation(data, material) -> np.ndarray:
     return cv
 
 
-# 计算协方差
 def covariance(data, material) -> np.ndarray:
+    """计算样本协方差"""
     assert material in data, f"{material} 应该是data中的物质,请重新输入"
     df = data[material]
     df = np.array(df)
@@ -81,8 +72,8 @@ def covariance(data, material) -> np.ndarray:
     return cov
 
 
-# 计算灰度值(rgb)  0.299R + 0.587G + 0.114B
 def greyscale_value(data:dict)->dict[str,pd.DataFrame]:
+    """计算灰度值(rgb)  0.299R + 0.587G + 0.114B"""
     grey_values = {}
     for k,v in data.items():
         index = []
@@ -96,8 +87,12 @@ def greyscale_value(data:dict)->dict[str,pd.DataFrame]:
         grey_values[k] = pd.DataFrame(values,index=index,columns=["灰度值"])
     return grey_values
 
-# 计算HSV和RGB转换的误差(使用极坐标衡量),rgb转换结果 - 数据原给出结果 => 计算结果说明不符合  HSV的计算
+
 def deviation_hsv_rgb(data)->dict[str,pd.DataFrame]:
+    """
+    计算HSV和RGB转换的误差(使用极坐标衡量),
+    rgb转换结果 - 数据原给出结果 => 计算结果说明不符合  HSV的计算
+    """
     deviation ={}
     for k0,v0 in data.items():
         gap=[]
