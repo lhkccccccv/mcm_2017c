@@ -1,4 +1,4 @@
-from execute_data import get_data
+from .execute_data import get_data
 from pprint import pprint
 
 
