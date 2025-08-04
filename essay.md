@@ -1,0 +1,165 @@
+<div style="text-align:center; font-size:20px; font-weight:bold;">比色卡颜色测量溶液浓度的评价方法</div>
+<div style="text-align:center; font-size:18px; font-weight:bold;">简介</div>
+<div style="text-indent: 2em; line-height: 1.5;font-size:15px;">
+随着照相技术和颜色分辨率提高，科学家希望建立物质浓度和比色卡颜色的数量关系，而减少通过肉眼观察而产生主观误差。我们通过主成分分析，将多维度的颜色信息降维分析，再通过线性回归，拟合不同的物质在比色卡上的颜色效果。
+</div>
+<div style="text-indent: 2em; line-height: 1.5;font-size:15px;">
+针对第一问，我们首先根据不同物质的不同浓度下，对于RGB三种颜色的敏感程度。通过计算溶液浓度和不同颜色的协方差，我们可以初步判断RGB可以作为分辨溶液浓度的依据。然后，我们讨论了RGB与色相和饱和度之间的关系，并得出色相和饱和度也会影响比色结果的结论。根据所给信息，我们接着讨论了物质在相同浓度和不同浓度下，由于颜色的不同而造成的分析误差。通过线性拟合，我们可以初步得出溶液浓度和颜色的数学关系。为了验证拟合的准确性，我们通过分析拟合结果的残差和。。。根据以上分析，我们对五组数据的优劣给出了具体的解释。</div>
+
+<div style="text-indent: 2em; line-height: 1.5;font-size:15px;">
+针对第二问，我们沿用了第一问的评价方法，</div>
+
+<div style="text-indent: 2em; line-height: 1.5;font-size:15px;">
+针对第三问，我们在网上查询了相关的实验测量数据，并用第二问给出的模型进行拟合分析。对于数据量的影响，，，，，对于颜色维度的影响，，，，，，，</div>
+
+<div style="text-indent: 2em; line-height: 3;font-size:17px;font-weight:bold">
+关键词： 主成分分析      相关系数     线性回归
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="text-align:center; font-size:20px; font-weight:bold;">一、 问题重述</div>
+
+###
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="text-align:center; font-size:20px; font-weight:bold;">二、 问题分析</div>
+
+###
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="text-align:center; font-size:20px; font-weight:bold;">三、 模型假设</div>
+
+为简化模型，我们作出如下假设：
+1. 第二问中，模型拟合结果与实际测量数据较为一致，且参数估计的置信水平超过 80%。
+2. 所给数据中，H表示色调，S表示饱和度
+
+<div style="text-align:center; font-size:20px; font-weight:bold;">四、 符号说明</div>
+
+<div style="text-align:center; font-size:12px;;">
+表1: 颜色和评价值的符号说明</div>
+
+| 符号    | 说明               | 取值范围  |
+|:---------:|:--------------------:|:-----------:|
+| R       | 红色颜色值         | 0~255     |
+| G       | 绿色颜色值         | 0~255     |
+| B       | 蓝色颜色值         | 0~255     |
+| H       | 色调               |           |
+| S       | 饱和度             |           |
+| $w_i$     | 表示第i个主成分的单位向量 |           |
+| σ       | 标准差             |           |
+| $\bar{x}$ | x 的平均值      |           |
+| $r_{i,j}$ | i和j相关系数       |           |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="text-align:center; font-size:20px; font-weight:bold;">五、 模型的建立与求解</div>
+
+### 5.1 问题一的模型建立：
+#### 消除量纲和均值影响
+<div style="text-indent: 2em; line-height: 1.5;font-size:15px;">
+由于RGB，ppm，HS的量纲不一致，我们首先考虑计算各数据的变异系数，以消除数据量纲和均值的影响，同时观察数据的离散程度。根据变异系数的定义，记变异系数为CV，有如下公式：</div>
+
+<div style="text-indent: 2em; line-height: 1.5;font-size:15px;">
+对于Data1.xlsx中所给的数据，我们发现对于不同的物质，其对于某些颜色是不敏感的，即当溶液浓度变化时，某一部分颜色变化幅度很小。这也就说明，对于不同的物质，应根据其对不同颜色的敏感程度进行分析。为了找出不同物质对于颜色的区别，主成分分析是一个不错的选择。
+主成分是原变量的一系列线性组合，且满足以下条件：</div>
+
+<div style="text-indent: 2em; line-height: 1.5;font-size:15px;">
+第一主成分是原变量的线性组合，其系数构成单位向量，且该组合的方差在所有可能的原变量线性组合中最大 —— 这一性质确保它能最大限度保留原数据的变异信息。第二主成分同样是原变量的线性组合（系数向量为单位向量），但需满足两个条件：一是两者的系数向量正交；二是在所有满足前一条件的线性组合中，方差最大。后续主成分的定义以此类推：每个主成分都是原变量的单位系数向量线性组合，且与之前所有主成分均不相关，同时在满足这些约束的前提下方差最大。实际应用中，通常根据前 k 个主成分的累计方差贡献率（即它们的方差之和占所有主成分总方差的比例）来确定保留的数量。当新增主成分的方差占比足够小时，便停止提取。由于主成分的数量不超过原变量的维度，通过保留部分主成分，能够以更低维度有效表征原数据的核心信息。</div>
+
+根据主成分分析的定义，以组胺为例，根据浓度、RGB和HS，记为6维列向量，分别为 $x_1$ ~ $x_6$ 我们可以得出如下公式：
+$$
+\begin{alignat} {2}
+
+\end{alignat}
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="text-align:center; font-size:20px; font-weight:bold;">六、 模型的分析与检验</div>
+
+###
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="text-align:center; font-size:20px; font-weight:bold;">七、 模型的评价，改进</div>
+
+###
+
+
+#### 有几个问题需要我们解决
++ 一个是预测模型 这个当然用线性拟合
++ 一个问题是rgbhv之间的相关性
++ 一个问题是评价数据质量
++ 一个问题是分析拟合出来的参数的不确定性
+
