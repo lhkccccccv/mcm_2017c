@@ -39,6 +39,8 @@ def read_csv1() -> dict:
             current[0] = tmp
     for k in data:
         data[k] = pd.DataFrame(data[k],columns=cols)
+        cols = ['ppm','R','G','B','H','S']
+        data[k] = data[k][cols]
     return data
 
 
@@ -113,12 +115,19 @@ def deviation_hsv_rgb(data)->dict[str,pd.DataFrame]:
         deviation[k0] = pd.DataFrame(gap,index =index,columns=['H的误差','S的误差','色相和色调的计算误差值'])
     return deviation
 
-# def pca(data,remain_component):
-#     res = {}
-#     for i in data:
-#         pca = PCA(remain_component)
-#         res[i] = pca.fit(data[i])
-#     return 
+def pca(data,remain_component)->dict:
+    res = {}
+    for i in data:
+        # 取出RGBHS，进行标准化
+        tmp = data[i].iloc[:,1:].to_numpy()
+        means = np.mean(tmp,axis=0)
+        standard = np.std(tmp,axis=0,ddof=1)
+        tmp = (tmp-means)/standard
+        pca = PCA(remain_component)
+        res[i] = pca.fit_transform(tmp)
+        print(f"{i}的载荷如下")
+        pprint(pca.components_)
+    return res
 
 # 计算浓度与颜色RGB，HSV的相关系数
 def rgb_hsv_related_coef(data):
