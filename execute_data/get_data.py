@@ -4,6 +4,7 @@ import colorsys
 import math
 from pathlib import Path
 from pprint import pprint
+from sklearn.decomposition import PCA
 
 __all__ = ["read_csv1","coefficient_of_variation","covariance","greyscale_value"]
 
@@ -112,6 +113,12 @@ def deviation_hsv_rgb(data)->dict[str,pd.DataFrame]:
         deviation[k0] = pd.DataFrame(gap,index =index,columns=['H的误差','S的误差','色相和色调的计算误差值'])
     return deviation
 
+# def pca(data,remain_component):
+#     res = {}
+#     for i in data:
+#         pca = PCA(remain_component)
+#         res[i] = pca.fit(data[i])
+#     return 
 
 # 计算浓度与颜色RGB，HSV的相关系数
 def rgb_hsv_related_coef(data):
