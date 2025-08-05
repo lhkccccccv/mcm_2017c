@@ -1,14 +1,24 @@
-from .execute_data import get_data
+from .execute_data import get_data,draw
 from pprint import pprint
 
 
 def main():
     data = get_data.read_csv1()
     # pprint(data)
-    cv = get_data.coefficient_of_variation(data, "组胺")
-    print("组胺的变异系数")
-    pprint(cv, width=150)
-    res =get_data.pca(data,2)
+
+    # 相关系数的计算结果
+    # pprint(get_data.corrcoef_matrix(data))
+    
+    # pprint(cv, width=150)
+
+    # 主成分分析的结果
+    res =get_data.pca(data,3)
+
+
+    # 画出浓度与颜色的散点图
+    # draw.scatter_coef(data)
+
+
     # greys = get_data.greyscale_value(data)
     # pprint(greys)
     # cov = get_data.covariance(data, "组胺")
