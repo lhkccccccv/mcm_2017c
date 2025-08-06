@@ -1,12 +1,4 @@
-import pandas as pd
-import numpy as np
-import colorsys
-import math
-from pathlib import Path
-from pprint import pprint
-import os
-from sklearn.decomposition import PCA
-
+from ..prelude import * 
 __all__ = ["read_csv1", "coefficient_of_variation", "covariance", "greyscale_value"]
 
 
@@ -67,20 +59,26 @@ def corrcoef_matrix(data):
         )
 
 
-def coefficient_of_variation(data, material) -> np.ndarray:
+def coefficient_of_variation(data) ->dict:
     """计算变异系数"""
-    assert material in data, f"{material} 应该是data中的物质,请重新输入"
-    df = data[material]
-    means = np.mean(df, axis=0)
-    assert (means != 0).all(), f"{means} 这里应该不含有0(as denom)"
+    results = {}
+    for name, df in data.items():
+        grouped = df.groupby('ppm')
+        cvs = grouped.agg(lambda x: x.std(ddof=0) / x.mean())
+        cvs = cvs[grouped.size() > 1]
+        if not cvs.empty:
+            results[name] = cvs
+    merge_df = (
+    pd.concat(results, names=['物质', 'ppm'])
+      .reset_index()
+    )
+    merge_df = merge_df.round(3)
+    merge_df.to_csv(
+        f"./mcm_2017c/output/变异系数.csv", index=False, encoding="utf-8-sig" 
+    )
+    # pprint(results)
+    return results
 
-    # 总体标准差计算
-    # standard = np.std(df,ddof=0,axis=0)
-
-    # 样本标准差计算
-    standard = np.std(df, ddof=1, axis=0)
-    cv = standard / means
-    return cv
 
 
 def covariance(data, material) -> np.ndarray:
@@ -145,14 +143,30 @@ def deviation_hsv_rgb(data) -> dict[str, pd.DataFrame]:
 
 def pca(data, remain_component) -> dict:
     res = {}
+    loads = []
     for i in data:
         tmp = standardization(data[i])
         pca = PCA(remain_component)
         res[i] = pca.fit_transform(tmp)
-        print(f"{i}的载荷如下")
-        pprint(pca.components_)
+        # 获取方差解释率
+        # pprint(f'{i}的主成分分析的方差解释率为')
+        # pprint(pca.explained_variance_ratio_)
+        # 输出pca载荷的信息
+        df0 = pd.DataFrame(pca.components_,columns=["R","G","B","H","S"])
+        df0['物质'] = i
+        loads.append(df0)
+    loads =pd.concat(loads,ignore_index=True)
+    loads = loads[['物质',"R","G","B","H","S"]] 
+    loads.to_csv('./mcm_2017c/output/pca_loads.csv', index=False, encoding='utf-8-sig')
+    # 输出pca结果
     output = []
-    for k,v in data.items():
-        df = pd.DataFrame()
-    pprint(res)
+    for k,v in res.items():
+        df = pd.DataFrame(v,columns=['特征1','特征2','特征3'])
+        df['物质'] = k
+        output.append(df)
+    output = pd.concat(output, ignore_index=True)
+    output = output[['物质','特征1','特征2','特征3']]
+    output.to_csv('./mcm_2017c/output/pca_results.csv', index=False, encoding='utf-8-sig')
     return res
+
+
